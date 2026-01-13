@@ -183,23 +183,27 @@ partners.patch('/parking/:id', zValidator('json', UpdateParkingLocationSchema), 
   return c.json({ ok: true })
 })
 
-partners.patch('/parking/:id/availability', zValidator('json', UpdateParkingAvailabilitySchema), (c) => {
-  const userId = getUserId(c)
-  if (!requirePartner(userId)) return c.json({ error: 'Partner access required' }, 403)
+partners.patch(
+  '/parking/:id/availability',
+  zValidator('json', UpdateParkingAvailabilitySchema),
+  (c) => {
+    const userId = getUserId(c)
+    if (!requirePartner(userId)) return c.json({ error: 'Partner access required' }, 403)
 
-  const parkingId = c.req.param('id')
-  const data = c.req.valid('json')
+    const parkingId = c.req.param('id')
+    const data = c.req.valid('json')
 
-  const updated = db
-    .prepare('UPDATE parking_locations SET available_spots = ? WHERE id = ? AND partner_id = ?')
-    .run(data.availableSpots, parkingId, userId)
+    const updated = db
+      .prepare('UPDATE parking_locations SET available_spots = ? WHERE id = ? AND partner_id = ?')
+      .run(data.availableSpots, parkingId, userId)
 
-  if (updated.changes === 0) {
-    return c.json({ error: 'Parking location not found' }, 404)
+    if (updated.changes === 0) {
+      return c.json({ error: 'Parking location not found' }, 404)
+    }
+
+    return c.json({ ok: true })
   }
-
-  return c.json({ ok: true })
-})
+)
 
 partners.get('/reservations', (c) => {
   const userId = getUserId(c)

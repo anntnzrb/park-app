@@ -30,9 +30,7 @@ reservations.use('*', authMiddleware)
 reservations.get('/', (c) => {
   const userId = getUserId(c)
   const rows = db
-    .prepare(
-      'SELECT * FROM reservations WHERE user_id = ? ORDER BY datetime(created_at) DESC'
-    )
+    .prepare('SELECT * FROM reservations WHERE user_id = ? ORDER BY datetime(created_at) DESC')
     .all(userId) as Array<{
     id: string
     parking_id: string
@@ -107,9 +105,7 @@ reservations.post('/', zValidator('json', CreateReservationSchema), (c) => {
   const userId = getUserId(c)
   const data = c.req.valid('json')
 
-  const parking = db
-    .prepare('SELECT * FROM parking_locations WHERE id = ?')
-    .get(data.parkingId) as
+  const parking = db.prepare('SELECT * FROM parking_locations WHERE id = ?').get(data.parkingId) as
     | {
         id: string
         hourly_rate: number
